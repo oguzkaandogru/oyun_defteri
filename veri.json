@@ -147,6 +147,26 @@
       "note": "",
       "added": 1783443004068
     },
+    "327239": {
+      "id": "327239",
+      "name": "The Legend of Zelda: Tears of the Kingdom",
+      "released": "2023-05-12",
+      "tba": false,
+      "bg": "https://media.rawg.io/media/games/556/55684bfd048706f4266d331d70050b37.jpg",
+      "platforms": [
+        "Nintendo Switch"
+      ],
+      "genres": [
+        "Adventure",
+        "Action"
+      ],
+      "metacritic": 96,
+      "rawgRating": 4.37,
+      "status": "backlog",
+      "myRating": 0,
+      "note": "",
+      "added": 1783444038720
+    },
     "442854": {
       "id": "442854",
       "name": "Mafia: Definitive Edition",
@@ -332,5 +352,5 @@
       "added": 1783443973132
     }
   },
-  "savedAt": 1783444015833
+  "savedAt": 1783444038720
 }
