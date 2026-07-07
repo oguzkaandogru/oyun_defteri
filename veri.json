@@ -445,6 +445,29 @@
       "note": "",
       "added": 1783444459137
     },
+    "58616": {
+      "id": "58616",
+      "name": "Assassin's Creed Odyssey",
+      "released": "2018-10-05",
+      "tba": false,
+      "bg": "https://media.rawg.io/media/games/c6b/c6bd26767c1053fef2b10bb852943559.jpg",
+      "platforms": [
+        "PC",
+        "Xbox One",
+        "PlayStation 4",
+        "Nintendo Switch"
+      ],
+      "genres": [
+        "Action",
+        "RPG"
+      ],
+      "metacritic": 85,
+      "rawgRating": 3.97,
+      "status": "backlog",
+      "myRating": 0,
+      "note": "",
+      "added": 1783444499138
+    },
     "58753": {
       "id": "58753",
       "name": "Forza Horizon 4",
@@ -793,5 +816,5 @@
       "added": 1783443973132
     }
   },
-  "savedAt": 1783444459137
+  "savedAt": 1783444499138
 }
