@@ -1,5 +1,30 @@
 {
   "games": {
+    "59359": {
+      "id": "59359",
+      "name": "A Plague Tale: Innocence",
+      "released": "2019-05-13",
+      "tba": false,
+      "bg": "https://media.rawg.io/media/games/b4a/b4adf80c36e267b35acc3497ed2af19c.jpg",
+      "platforms": [
+        "PC",
+        "PlayStation 5",
+        "Xbox One",
+        "PlayStation 4",
+        "Xbox Series S/X",
+        "Nintendo Switch"
+      ],
+      "genres": [
+        "Adventure",
+        "Action"
+      ],
+      "metacritic": 82,
+      "rawgRating": 4.15,
+      "status": "done",
+      "myRating": 0,
+      "note": "",
+      "added": 1783443004068
+    },
     "442854": {
       "id": "442854",
       "name": "Mafia: Definitive Edition",
@@ -22,7 +47,54 @@
       "myRating": 0,
       "note": "",
       "added": 1783440812301
+    },
+    "442855": {
+      "id": "442855",
+      "name": "Mafia II: Definitive Edition",
+      "released": "2020-05-19",
+      "tba": false,
+      "bg": "https://media.rawg.io/media/games/d73/d7364906c530ccc2d89b0b5d8695e03c.jpg",
+      "platforms": [
+        "PC",
+        "Xbox One",
+        "PlayStation 4"
+      ],
+      "genres": [
+        "Adventure",
+        "Action"
+      ],
+      "metacritic": 65,
+      "rawgRating": 3.89,
+      "status": "playing",
+      "myRating": 0,
+      "note": "",
+      "added": 1783443035297
+    },
+    "616697": {
+      "id": "616697",
+      "name": "A Plague Tale: Requiem",
+      "released": "2022-10-17",
+      "tba": false,
+      "bg": "https://media.rawg.io/media/games/cd0/cd074f3f6045297cda9ad077273c09b6.jpg",
+      "platforms": [
+        "PC",
+        "PlayStation 5",
+        "Xbox One",
+        "PlayStation 4",
+        "Xbox Series S/X",
+        "Nintendo Switch"
+      ],
+      "genres": [
+        "Adventure",
+        "Action"
+      ],
+      "metacritic": null,
+      "rawgRating": 4.28,
+      "status": "playing",
+      "myRating": 0,
+      "note": "",
+      "added": 1783443021873
     }
   },
-  "savedAt": 1783440888924
+  "savedAt": 1783443037485
 }
