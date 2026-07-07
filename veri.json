@@ -94,7 +94,28 @@
       "myRating": 0,
       "note": "",
       "added": 1783443021873
+    },
+    "704634": {
+      "id": "704634",
+      "name": "Uncharted: Legacy of Thieves Collection",
+      "released": "2022-01-28",
+      "tba": false,
+      "bg": "https://media.rawg.io/media/games/de6/de66bc4c72b45c3bb906c85d0628112d.jpg",
+      "platforms": [
+        "PC",
+        "PlayStation 5"
+      ],
+      "genres": [
+        "Adventure",
+        "Action"
+      ],
+      "metacritic": null,
+      "rawgRating": 4.46,
+      "status": "done",
+      "myRating": 0,
+      "note": "",
+      "added": 1783443057542
     }
   },
-  "savedAt": 1783443037485
+  "savedAt": 1783443060684
 }
