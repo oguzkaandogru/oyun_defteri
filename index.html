@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Oyun Defteri</title>
+<meta name="description" content="Kişisel bilgisayar ve konsol oyunu takipçisi — sunucusuz, veriler cihazında.">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#0D0B14">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0D0B14; --panel:#161225; --panel2:#1E1833; --line:#2B2347;
+  --text:#EDEAF6; --mut:#938BAC; --acc:#A48BFF; --gold:#E8B44A;
+  --green:#5FD9A4; --red:#E06C6C; --blue:#6CA8E0;
+  --r:14px;
+}
+*{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
+html,body{margin:0; padding:0}
+body{
+  background:var(--bg); color:var(--text);
+  font-family:"Manrope",system-ui,sans-serif; font-size:15px; line-height:1.5;
+  padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+.wrap{max-width:760px; margin:0 auto; padding:16px 14px 90px}
+
+/* ---------- üst bar ---------- */
+header{display:flex; align-items:center; gap:10px; margin-bottom:14px}
+h1{font-family:"Bricolage Grotesque",sans-serif; font-weight:800; font-size:26px; margin:0; letter-spacing:.2px}
+h1 .dot{color:var(--acc)}
+.hbtns{margin-left:auto; display:flex; gap:6px}
+.hbtn{
+  background:var(--panel); border:1px solid var(--line); color:var(--mut);
+  width:38px; height:38px; border-radius:11px; font-size:17px; cursor:pointer;
+  display:flex; align-items:center; justify-content:center; transition:color .15s,border-color .15s;
+}
+.hbtn:hover{color:var(--text); border-color:var(--acc)}
+.hbtn.on{color:var(--gold); border-color:var(--gold)}
+.hbtn:focus-visible{outline:2px solid var(--acc); outline-offset:2px}
+
+/* ---------- arama ---------- */
+.searchbox{position:relative; margin-bottom:14px}
+#q{
+  width:100%; background:var(--panel); border:1px solid var(--line); color:var(--text);
+  border-radius:var(--r); padding:12px 40px 12px 14px; font-size:15px; font-family:inherit;
+}
+#q::placeholder{color:var(--mut)}
+#q:focus{outline:none; border-color:var(--acc)}
+.searchbox .lens{position:absolute; right:13px; top:11px; color:var(--mut); pointer-events:none}
+#results{
+  position:absolute; top:calc(100% + 6px); left:0; right:0; z-index:30;
+  background:var(--panel2); border:1px solid var(--line); border-radius:var(--r);
+  max-height:62vh; overflow:auto; display:none; box-shadow:0 14px 40px rgba(0,0,0,.55);
+}
+#results.open{display:block}
+.res{display:flex; gap:10px; padding:10px 12px; border-bottom:1px solid var(--line); align-items:center}
+.res:last-child{border-bottom:none}
+.res img{width:64px; height:40px; object-fit:cover; border-radius:7px; background:var(--panel); flex:none}
+.res .ri{min-width:0; flex:1}
+.res .rn{font-weight:700; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.res .rm{font-size:12px; color:var(--mut); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.res .ra{display:flex; gap:5px; flex:none}
+.abtn{
+  border:1px solid var(--line); background:var(--panel); color:var(--text);
+  border-radius:9px; padding:6px 9px; font-size:12px; font-weight:700; cursor:pointer; font-family:inherit;
+}
+.abtn.play{border-color:var(--acc); color:var(--acc)}
+.abtn:hover{background:var(--line)}
+.resmsg{padding:14px; color:var(--mut); font-size:13.5px; text-align:center}
+.resmsg a{color:var(--acc)}
+
+/* ---------- sekmeler ---------- */
+nav{display:flex; gap:6px; overflow-x:auto; margin-bottom:14px; padding-bottom:2px; scrollbar-width:none}
+nav::-webkit-scrollbar{display:none}
+.tab{
+  flex:none; background:var(--panel); border:1px solid var(--line); color:var(--mut);
+  border-radius:999px; padding:7px 14px; font-size:13.5px; font-weight:700; cursor:pointer; font-family:inherit;
+  transition:color .15s,border-color .15s;
+}
+.tab .n{opacity:.65; font-weight:600; margin-left:4px}
+.tab.on{color:var(--text); border-color:var(--acc); background:var(--panel2)}
+.tab:focus-visible{outline:2px solid var(--acc); outline-offset:2px}
+
+/* ---------- kartlar ---------- */
+.card{
+  position:relative; background:var(--panel); border:1px solid var(--line);
+  border-radius:var(--r); margin-bottom:12px; overflow:hidden; display:flex;
+}
+.card .strip{width:4px; flex:none}
+.strip.playing{background:var(--acc)} .strip.backlog{background:var(--blue)}
+.strip.done{background:var(--green)} .strip.dropped{background:var(--red)}
+.card .body{flex:1; min-width:0; padding:12px 12px 12px 12px; display:flex; gap:12px}
+.cover{width:96px; height:60px; object-fit:cover; border-radius:9px; background:var(--panel2); flex:none}
+.cinfo{min-width:0; flex:1}
+.cname{font-family:"Bricolage Grotesque",sans-serif; font-weight:700; font-size:16px; line-height:1.25; margin:0 0 2px}
+.cmeta{font-size:12.5px; color:var(--mut); margin-bottom:6px}
+.chips{display:flex; flex-wrap:wrap; gap:5px; margin-bottom:8px}
+.chip{font-size:11px; font-weight:700; color:var(--mut); border:1px solid var(--line); border-radius:999px; padding:2px 8px}
+.chip.soon{color:var(--gold); border-color:var(--gold)}
+.chip.mc{color:var(--green); border-color:var(--green)}
+.crow{display:flex; align-items:center; gap:8px; flex-wrap:wrap}
+select.status{
+  background:var(--panel2); color:var(--text); border:1px solid var(--line);
+  border-radius:9px; padding:5px 8px; font-size:12.5px; font-family:inherit; cursor:pointer;
+}
+select.status:focus{outline:none; border-color:var(--acc)}
+.stars{display:flex; gap:1px}
+.star{background:none; border:none; cursor:pointer; font-size:16px; color:var(--line); padding:0 1px}
+.star.on{color:var(--gold)}
+.icobtn{background:none; border:none; color:var(--mut); cursor:pointer; font-size:15px; padding:2px 4px}
+.icobtn:hover{color:var(--text)}
+.icobtn.del:hover{color:var(--red)}
+.note{
+  margin-top:8px; font-size:12.5px; color:var(--mut); background:var(--panel2);
+  border-radius:8px; padding:6px 9px; white-space:pre-wrap; word-break:break-word;
+}
+.empty{color:var(--mut); text-align:center; padding:44px 16px; font-size:14px}
+.empty b{color:var(--text)}
+
+/* ---------- istatistik ---------- */
+.stats{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px; margin-bottom:14px}
+.sbox{background:var(--panel); border:1px solid var(--line); border-radius:var(--r); padding:14px}
+.sbox .v{font-family:"Bricolage Grotesque",sans-serif; font-weight:800; font-size:26px}
+.sbox .l{font-size:12px; color:var(--mut); font-weight:600}
+.sbox .v.a{color:var(--acc)} .sbox .v.g{color:var(--green)} .sbox .v.au{color:var(--gold)} .sbox .v.b{color:var(--blue)}
+.gbar{background:var(--panel); border:1px solid var(--line); border-radius:var(--r); padding:14px}
+.gbar h3{margin:0 0 10px; font-size:14px}
+.grow{display:flex; align-items:center; gap:10px; margin-bottom:7px; font-size:12.5px}
+.grow .gl{width:110px; color:var(--mut); font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.grow .gt{flex:1; height:8px; background:var(--panel2); border-radius:4px; overflow:hidden}
+.grow .gf{height:100%; background:var(--acc); border-radius:4px}
+.grow .gn{width:24px; text-align:right; color:var(--mut)}
+
+/* ---------- modal ---------- */
+.mback{position:fixed; inset:0; background:rgba(5,4,10,.7); z-index:50; display:none; align-items:flex-end; justify-content:center}
+.mback.open{display:flex}
+.modal{
+  background:var(--panel); border:1px solid var(--line); border-radius:18px 18px 0 0;
+  width:100%; max-width:760px; max-height:88vh; overflow:auto; padding:20px 18px 26px;
+}
+@media(min-width:700px){ .mback{align-items:center} .modal{border-radius:18px} }
+.modal h2{font-family:"Bricolage Grotesque",sans-serif; margin:0 0 4px; font-size:19px}
+.modal p{color:var(--mut); font-size:13px; margin:6px 0 12px}
+.modal p a{color:var(--acc)}
+.modal label{display:block; font-size:12.5px; font-weight:700; color:var(--mut); margin:12px 0 5px}
+.modal input{
+  width:100%; background:var(--panel2); border:1px solid var(--line); color:var(--text);
+  border-radius:10px; padding:10px 12px; font-size:14px; font-family:inherit;
+}
+.modal input:focus{outline:none; border-color:var(--acc)}
+.mrow{display:flex; gap:8px; margin-top:16px; flex-wrap:wrap}
+.mbtn{
+  border:1px solid var(--line); background:var(--panel2); color:var(--text);
+  border-radius:11px; padding:10px 15px; font-size:13.5px; font-weight:700; cursor:pointer; font-family:inherit;
+}
+.mbtn.pri{background:var(--acc); border-color:var(--acc); color:#14102A}
+.mbtn.danger{color:var(--red); border-color:var(--red); background:none}
+hr.sep{border:none; border-top:1px solid var(--line); margin:18px 0}
+
+/* ---------- toast + footer ---------- */
+#toast{
+  position:fixed; left:50%; bottom:24px; transform:translateX(-50%) translateY(20px);
+  background:var(--panel2); border:1px solid var(--acc); color:var(--text);
+  padding:10px 16px; border-radius:12px; font-size:13.5px; font-weight:600;
+  opacity:0; transition:opacity .25s, transform .25s; z-index:80; pointer-events:none;
+  max-width:88vw; text-align:center;
+}
+#toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+footer{margin-top:26px; text-align:center; color:var(--mut); font-size:12px}
+footer a{color:var(--mut)}
+@media(prefers-reduced-motion:reduce){ *{transition:none !important} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>Oyun Defteri<span class="dot">.</span></h1>
+  <div class="hbtns">
+    <button class="hbtn" id="btnSync" title="GitHub yedekleme">☁</button>
+    <button class="hbtn" id="btnExport" title="Yedek indir">⇩</button>
+    <button class="hbtn" id="btnImport" title="Yedek yükle">⇧</button>
+    <button class="hbtn" id="btnSettings" title="Ayarlar">⚙</button>
+  </div>
+</header>
+
+<div class="searchbox">
+  <input id="q" type="search" placeholder="Oyun ara… (ör. Elden Ring)" autocomplete="off">
+  <span class="lens">🔍</span>
+  <div id="results"></div>
+</div>
+
+<nav id="tabs"></nav>
+<main id="list"></main>
+
+<footer>Sunucusuz çalışır — verilerin bu cihazda. Oyun verileri: <a href="https://rawg.io" target="_blank" rel="noopener">RAWG</a></footer>
+</div>
+
+<!-- Ayarlar -->
+<div class="mback" id="mSettings">
+  <div class="modal">
+    <h2>Ayarlar</h2>
+    <p>Arama yapabilmek için ücretsiz bir RAWG API anahtarı gerekir. <a href="https://rawg.io/apidocs" target="_blank" rel="noopener">rawg.io/apidocs</a> adresinden "Get API Key" ile kayıt olup anahtarını al, buraya bir kez yapıştır — cihazında saklanır, kimseye gönderilmez.</p>
+    <label for="inpKey">RAWG API anahtarı</label>
+    <input id="inpKey" type="text" placeholder="ör. 3f9a1c…" autocomplete="off">
+    <div class="mrow">
+      <button class="mbtn pri" id="saveKey">Kaydet</button>
+      <button class="mbtn" id="closeSettings">Kapat</button>
+    </div>
+    <hr class="sep">
+    <p style="margin-top:0"><b style="color:var(--red)">Tehlikeli bölge:</b> aşağıdaki buton tüm listeni ve işaretlerini kalıcı olarak siler. Önce ⇩ ile yedek almanı öneririm.</p>
+    <button class="mbtn danger" id="btnReset">Tüm verileri sıfırla</button>
+  </div>
+</div>
+
+<!-- GitHub yedekleme -->
+<div class="mback" id="mSync">
+  <div class="modal">
+    <h2>GitHub yedekleme</h2>
+    <p>İstersen listen GitHub deponda <b>veri.json</b> olarak da saklansın; böylece telefon ve bilgisayarda aynı listeyi görürsün, cihaz verisi silinse bile hiçbir şey kaybolmaz. Depo adını ve "fine-grained" erişim token'ını gir (token'ı yalnızca bu depoya, Contents: Read and write iznine ver).</p>
+    <label for="inpRepo">Depo (kullanıcıadı/depo)</label>
+    <input id="inpRepo" type="text" placeholder="ör. ahmet/oyun-defteri" autocomplete="off">
+    <label for="inpToken">Erişim token'ı</label>
+    <input id="inpToken" type="password" placeholder="github_pat_…" autocomplete="off">
+    <div class="mrow">
+      <button class="mbtn pri" id="saveSync">Bağlan ve kaydet</button>
+      <button class="mbtn" id="btnGhSaveNow">Şimdi kaydet</button>
+      <button class="mbtn" id="btnGhLoad">GitHub'dan geri yükle</button>
+      <button class="mbtn" id="closeSync">Kapat</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" role="status"></div>
+<input type="file" id="fileImport" accept="application/json" hidden>
+
+<script>
+"use strict";
+/* =====================================================
+   Oyun Defteri — kişisel oyun takipçisi
+   Veriler localStorage'da; oyun bilgileri RAWG API'den.
+   ===================================================== */
+
+const STORE_KEY = "oyun-defteri-v1";
+const KEY_RAWG  = "OD_RAWG_KEY";
+const KEY_REPO  = "OD_GH_REPO";
+const KEY_TOKEN = "OD_GH_TOKEN";
+
+const STATUSES = [
+  { id:"playing", ad:"Oynuyorum",   bos:"Şu anda oynadığın bir oyun yok. Yukarıdan arayıp <b>▶</b> ile ekle." },
+  { id:"backlog", ad:"Oynayacağım", bos:"Bekleme listen boş. Merak ettiğin oyunları buraya at, çıkış tarihlerini de takip ederim." },
+  { id:"done",    ad:"Bitirdim",    bos:"Henüz bitirdiğin oyun işaretlenmemiş." },
+  { id:"dropped", ad:"Bıraktım",    bos:"Yarım bıraktığın oyun yok — helal." },
+  { id:"stats",   ad:"İstatistik",  bos:"" }
+];
+
+let state = load();
+let tab = "playing";
+let ghTimer = null;
+
+function load(){
+  try{
+    const raw = localStorage.getItem(STORE_KEY);
+    if(raw){ const s = JSON.parse(raw); if(s && s.games) return s; }
+  }catch(e){}
+  return { games:{}, savedAt:0 };
+}
+function persist(){
+  state.savedAt = Date.now();
+  localStorage.setItem(STORE_KEY, JSON.stringify(state));
+  ghQueue();
+}
+
+/* ---------- yardımcılar ---------- */
+const $ = s => document.querySelector(s);
+function esc(t){ return String(t ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+function toast(msg){
+  const t = $("#toast"); t.textContent = msg; t.classList.add("show");
+  clearTimeout(t._h); t._h = setTimeout(()=> t.classList.remove("show"), 2600);
+}
+const PLAT_KISA = {
+  "PlayStation 5":"PS5","PlayStation 4":"PS4","PlayStation 3":"PS3",
+  "Xbox Series S/X":"Xbox S|X","Xbox One":"Xbox One","Xbox 360":"Xbox 360",
+  "Nintendo Switch":"Switch","Nintendo Switch 2":"Switch 2","PC":"PC",
+  "iOS":"iOS","Android":"Android","macOS":"Mac","Linux":"Linux"
+};
+function platlar(g){ return (g.platforms||[]).map(p => PLAT_KISA[p] || p); }
+function trTarih(iso){
+  if(!iso) return null;
+  const d = new Date(iso + "T00:00:00");
+  if(isNaN(d)) return null;
+  return d.toLocaleDateString("tr-TR", { day:"numeric", month:"long", year:"numeric" });
+}
+function gelecekMi(g){
+  if(g.tba) return true;
+  if(!g.released) return false;
+  return new Date(g.released + "T00:00:00") > new Date();
+}
+function kalanGun(iso){
+  const f = Math.ceil((new Date(iso + "T00:00:00") - new Date()) / 86400000);
+  return f;
+}
+
+/* ---------- RAWG arama ---------- */
+const q = $("#q"), results = $("#results");
+let qTimer = null, lastQuery = "";
+
+q.addEventListener("input", () => {
+  clearTimeout(qTimer);
+  const v = q.value.trim();
+  if(v.length < 2){ closeResults(); return; }
+  qTimer = setTimeout(()=> search(v), 400);
+});
+document.addEventListener("click", e => {
+  if(!e.target.closest(".searchbox")) closeResults();
+});
+function closeResults(){ results.classList.remove("open"); results.innerHTML = ""; }
+
+async function search(text){
+  const key = localStorage.getItem(KEY_RAWG);
+  if(!key){
+    results.innerHTML = '<div class="resmsg">Arama için önce ücretsiz RAWG anahtarını gir — sağ üstteki <b>⚙</b> butonundan. Nasıl alınacağı orada yazıyor.</div>';
+    results.classList.add("open");
+    return;
+  }
+  lastQuery = text;
+  results.innerHTML = '<div class="resmsg">Aranıyor…</div>';
+  results.classList.add("open");
+  try{
+    const url = "https://api.rawg.io/api/games?key=" + encodeURIComponent(key) +
+                "&search=" + encodeURIComponent(text) + "&page_size=12";
+    const r = await fetch(url);
+    if(r.status === 401){ results.innerHTML = '<div class="resmsg">Anahtar geçersiz görünüyor — ⚙ Ayarlar\'dan kontrol et.</div>'; return; }
+    if(!r.ok) throw new Error("HTTP " + r.status);
+    const data = await r.json();
+    if(text !== lastQuery) return; // eski sonuç, atla
+    const items = (data.results || []);
+    if(!items.length){ results.innerHTML = '<div class="resmsg">Sonuç bulunamadı.</div>'; return; }
+    results.innerHTML = items.map(g => {
+      const yil = g.released ? g.released.slice(0,4) : (g.tba ? "Çıkış belirsiz" : "");
+      const plats = (g.platforms||[]).map(x => PLAT_KISA[x.platform.name] || x.platform.name).slice(0,4).join(" · ");
+      return '<div class="res" data-id="'+ g.id +'">' +
+        (g.background_image ? '<img loading="lazy" src="'+ esc(g.background_image) +'" alt="">' : '<img alt="" src="data:,">') +
+        '<div class="ri"><div class="rn">'+ esc(g.name) +'</div>' +
+        '<div class="rm">'+ esc([yil, plats].filter(Boolean).join(" — ")) +'</div></div>' +
+        '<div class="ra"><button class="abtn play" data-add="playing" title="Oynuyorum listesine">▶</button>' +
+        '<button class="abtn" data-add="backlog" title="Oynayacağım listesine">＋</button></div>' +
+        '</div>';
+    }).join("");
+    results._items = {};
+    items.forEach(g => results._items[g.id] = g);
+  }catch(e){
+    results.innerHTML = '<div class="resmsg">Bağlantı hatası — internetini kontrol edip tekrar dene.</div>';
+  }
+}
+
+results.addEventListener("click", e => {
+  const btn = e.target.closest("[data-add]");
+  if(!btn) return;
+  const row = btn.closest(".res");
+  const g = results._items && results._items[row.dataset.id];
+  if(!g) return;
+  addGame(g, btn.dataset.add);
+});
+
+function addGame(g, status){
+  const id = String(g.id);
+  if(state.games[id]){
+    state.games[id].status = status;
+    toast('"'+ g.name +'" zaten listendeydi — durumu güncellendi.');
+  }else{
+    state.games[id] = {
+      id, name: g.name,
+      released: g.released || null,
+      tba: !!g.tba,
+      bg: g.background_image || null,
+      platforms: (g.platforms||[]).map(x => x.platform.name),
+      genres: (g.genres||[]).map(x => x.name),
+      metacritic: g.metacritic || null,
+      rawgRating: g.rating || null,
+      status, myRating: 0, note: "",
+      added: Date.now()
+    };
+    toast('"'+ g.name +'" eklendi ✓');
+  }
+  persist();
+  q.value = ""; closeResults();
+  tab = status; renderAll();
+}
+
+/* ---------- sekmeler + liste ---------- */
+function renderTabs(){
+  $("#tabs").innerHTML = STATUSES.map(s => {
+    const n = s.id === "stats" ? "" :
+      '<span class="n">'+ Object.values(state.games).filter(g => g.status === s.id).length +'</span>';
+    return '<button class="tab'+ (tab===s.id ? " on":"") +'" data-tab="'+ s.id +'">'+ s.ad + n +'</button>';
+  }).join("");
+}
+$("#tabs").addEventListener("click", e => {
+  const b = e.target.closest("[data-tab]");
+  if(!b) return;
+  tab = b.dataset.tab; renderAll();
+});
+
+function renderList(){
+  const list = $("#list");
+  if(tab === "stats"){ renderStats(); return; }
+  const st = STATUSES.find(s => s.id === tab);
+  let games = Object.values(state.games).filter(g => g.status === tab);
+  // Bekleme listesinde yakında çıkacaklar üstte, çıkışa en yakın önce
+  games.sort((a,b) => {
+    const fa = gelecekMi(a), fb = gelecekMi(b);
+    if(fa !== fb) return fa ? -1 : 1;
+    if(fa && fb){
+      if(a.tba !== b.tba) return a.tba ? 1 : -1;
+      if(a.released && b.released) return a.released.localeCompare(b.released);
+    }
+    return b.added - a.added;
+  });
+  if(!games.length){
+    list.innerHTML = '<div class="empty">'+ st.bos +'</div>';
+    return;
+  }
+  list.innerHTML = games.map(cardHTML).join("");
+}
+
+function cardHTML(g){
+  const plats = platlar(g).slice(0,5).join(" · ");
+  const tarih = g.tba ? "Çıkış tarihi belirsiz" : (trTarih(g.released) || "");
+  let soon = "";
+  if(gelecekMi(g) && g.released){
+    const k = kalanGun(g.released);
+    soon = '<span class="chip soon">🕒 '+ (k <= 0 ? "Bugün çıkıyor!" : k + " gün kaldı") +'</span>';
+  }else if(g.tba){
+    soon = '<span class="chip soon">🕒 Yakında</span>';
+  }
+  const mc = g.metacritic ? '<span class="chip mc">MC '+ g.metacritic +'</span>' : "";
+  const rw = g.rawgRating ? '<span class="chip">★ '+ Number(g.rawgRating).toFixed(1) +'</span>' : "";
+  const genres = (g.genres||[]).slice(0,3).map(x => '<span class="chip">'+ esc(x) +'</span>').join("");
+  const stars = [1,2,3,4,5].map(i =>
+    '<button class="star'+ (g.myRating >= i ? " on":"") +'" data-star="'+ i +'" title="'+ i +'/5">★</button>'
+  ).join("");
+  const opts = STATUSES.filter(s => s.id !== "stats").map(s =>
+    '<option value="'+ s.id +'"'+ (g.status === s.id ? " selected":"") +'>'+ s.ad +'</option>'
+  ).join("");
+  return '<article class="card" data-id="'+ g.id +'">' +
+    '<div class="strip '+ g.status +'"></div>' +
+    '<div class="body">' +
+      (g.bg ? '<img class="cover" loading="lazy" src="'+ esc(g.bg) +'" alt="">' : '<div class="cover"></div>') +
+      '<div class="cinfo">' +
+        '<h2 class="cname">'+ esc(g.name) +'</h2>' +
+        '<div class="cmeta">'+ esc([tarih, plats].filter(Boolean).join(" — ")) +'</div>' +
+        '<div class="chips">'+ soon + mc + rw + genres +'</div>' +
+        '<div class="crow">' +
+          '<select class="status" title="Durum">'+ opts +'</select>' +
+          '<span class="stars" title="Benim puanım">'+ stars +'</span>' +
+          '<button class="icobtn" data-act="note" title="Not">📝</button>' +
+          '<button class="icobtn del" data-act="del" title="Listeden çıkar">✕</button>' +
+        '</div>' +
+        (g.note ? '<div class="note">'+ esc(g.note) +'</div>' : "") +
+      '</div>' +
+    '</div>' +
+  '</article>';
+}
+
+$("#list").addEventListener("click", e => {
+  const card = e.target.closest(".card");
+  if(!card) return;
+  const g = state.games[card.dataset.id];
+  if(!g) return;
+  const star = e.target.closest("[data-star]");
+  if(star){
+    const v = Number(star.dataset.star);
+    g.myRating = (g.myRating === v) ? 0 : v; // aynı yıldıza tekrar basınca sıfırla
+    persist(); renderAll(); return;
+  }
+  const act = e.target.closest("[data-act]");
+  if(!act) return;
+  if(act.dataset.act === "del"){
+    if(confirm('"'+ g.name +'" listeden çıkarılsın mı?')){
+      delete state.games[g.id];
+      persist(); renderAll();
+      toast("Çıkarıldı.");
+    }
+  }else if(act.dataset.act === "note"){
+    const t = prompt('"'+ g.name +'" için notun:', g.note || "");
+    if(t !== null){ g.note = t.trim(); persist(); renderAll(); }
+  }
+});
+$("#list").addEventListener("change", e => {
+  const sel = e.target.closest("select.status");
+  if(!sel) return;
+  const card = e.target.closest(".card");
+  const g = state.games[card.dataset.id];
+  if(!g) return;
+  g.status = sel.value;
+  persist(); renderAll();
+});
+
+/* ---------- istatistik ---------- */
+function renderStats(){
+  const all = Object.values(state.games);
+  const say = id => all.filter(g => g.status === id).length;
+  const done = all.filter(g => g.status === "done");
+  const puanli = done.filter(g => g.myRating > 0);
+  const ort = puanli.length ? (puanli.reduce((t,g)=>t+g.myRating,0)/puanli.length).toFixed(1) : "—";
+  const yakinda = all.filter(gelecekMi).length;
+
+  const turler = {};
+  all.forEach(g => (g.genres||[]).forEach(t => turler[t] = (turler[t]||0)+1));
+  const top = Object.entries(turler).sort((a,b)=>b[1]-a[1]).slice(0,6);
+  const maxT = top.length ? top[0][1] : 1;
+
+  const yildizli = done.filter(g => g.myRating === 5).map(g => esc(g.name));
+
+  $("#list").innerHTML =
+    '<div class="stats">' +
+      '<div class="sbox"><div class="v a">'+ say("playing") +'</div><div class="l">şu an oynanıyor</div></div>' +
+      '<div class="sbox"><div class="v b">'+ say("backlog") +'</div><div class="l">sırada bekliyor</div></div>' +
+      '<div class="sbox"><div class="v g">'+ say("done") +'</div><div class="l">bitirildi</div></div>' +
+      '<div class="sbox"><div class="v">'+ say("dropped") +'</div><div class="l">yarım kaldı</div></div>' +
+      '<div class="sbox"><div class="v au">'+ ort +'</div><div class="l">ortalama puanın (bitenler)</div></div>' +
+      '<div class="sbox"><div class="v au">'+ yakinda +'</div><div class="l">yakında çıkacak</div></div>' +
+    '</div>' +
+    (top.length ?
+      '<div class="gbar"><h3>En çok oynadığın türler</h3>' +
+      top.map(([t,n]) =>
+        '<div class="grow"><span class="gl">'+ esc(t) +'</span>' +
+        '<span class="gt"><span class="gf" style="width:'+ Math.round(n/maxT*100) +'%"></span></span>' +
+        '<span class="gn">'+ n +'</span></div>'
+      ).join("") + '</div>' : "") +
+    (yildizli.length ?
+      '<div class="gbar" style="margin-top:10px"><h3>5 yıldızlıkların ★</h3>' +
+      '<div style="font-size:13px; color:var(--mut)">'+ yildizli.join(" · ") +'</div></div>' : "");
+}
+
+/* ---------- yedek indir / yükle ---------- */
+$("#btnExport").addEventListener("click", () => {
+  const blob = new Blob([JSON.stringify(state, null, 2)], { type:"application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "oyun-defteri-yedek-" + new Date().toISOString().slice(0,10) + ".json";
+  a.click();
+  URL.revokeObjectURL(a.href);
+  toast("Yedek indirildi ✓");
+});
+$("#btnImport").addEventListener("click", () => $("#fileImport").click());
+$("#fileImport").addEventListener("change", e => {
+  const f = e.target.files[0];
+  if(!f) return;
+  const r = new FileReader();
+  r.onload = () => {
+    try{
+      const s = JSON.parse(r.result);
+      if(!s || typeof s.games !== "object") throw 0;
+      state = { games: s.games, savedAt: Date.now() };
+      persist(); renderAll();
+      toast("Yedek yüklendi ✓ ("+ Object.keys(state.games).length +" oyun)");
+    }catch(err){ toast("Bu dosya geçerli bir yedek değil."); }
+  };
+  r.readAsText(f);
+  e.target.value = "";
+});
+
+/* ---------- ayarlar ---------- */
+const mSettings = $("#mSettings");
+$("#btnSettings").addEventListener("click", () => {
+  $("#inpKey").value = localStorage.getItem(KEY_RAWG) || "";
+  mSettings.classList.add("open");
+});
+$("#closeSettings").addEventListener("click", () => mSettings.classList.remove("open"));
+$("#saveKey").addEventListener("click", () => {
+  const v = $("#inpKey").value.trim();
+  if(v) localStorage.setItem(KEY_RAWG, v); else localStorage.removeItem(KEY_RAWG);
+  mSettings.classList.remove("open");
+  toast(v ? "Anahtar kaydedildi ✓ Artık arama yapabilirsin." : "Anahtar silindi.");
+});
+$("#btnReset").addEventListener("click", () => {
+  if(!confirm("Tüm liste ve işaretler silinecek. Devam edilsin mi?")) return;
+  if(!confirm("Emin misin? Bu işlem geri alınamaz. (İstersen önce ⇩ ile yedek al.)")) return;
+  localStorage.removeItem(STORE_KEY);
+  state = { games:{}, savedAt:0 };
+  renderAll();
+  mSettings.classList.remove("open");
+  toast("Her şey sıfırlandı — temiz sayfa ✓");
+});
+[mSettings, $("#mSync")].forEach(m => m.addEventListener("click", e => {
+  if(e.target === m) m.classList.remove("open");
+}));
+
+/* ---------- GitHub yedekleme ---------- */
+const mSync = $("#mSync");
+function ghCfg(){
+  const repo = localStorage.getItem(KEY_REPO), token = localStorage.getItem(KEY_TOKEN);
+  return (repo && token) ? { repo, token } : null;
+}
+function ghUi(){ $("#btnSync").classList.toggle("on", !!ghCfg()); }
+
+$("#btnSync").addEventListener("click", () => {
+  $("#inpRepo").value = localStorage.getItem(KEY_REPO) || "";
+  $("#inpToken").value = localStorage.getItem(KEY_TOKEN) || "";
+  mSync.classList.add("open");
+});
+$("#closeSync").addEventListener("click", () => mSync.classList.remove("open"));
+$("#saveSync").addEventListener("click", async () => {
+  const repo = $("#inpRepo").value.trim(), token = $("#inpToken").value.trim();
+  if(!repo || !token){
+    localStorage.removeItem(KEY_REPO); localStorage.removeItem(KEY_TOKEN);
+    ghUi(); mSync.classList.remove("open");
+    toast("GitHub bağlantısı kaldırıldı."); return;
+  }
+  localStorage.setItem(KEY_REPO, repo); localStorage.setItem(KEY_TOKEN, token);
+  ghUi();
+  const ok = await ghSaveNow(true);
+  if(ok) mSync.classList.remove("open");
+});
+$("#btnGhSaveNow").addEventListener("click", () => ghSaveNow(true));
+$("#btnGhLoad").addEventListener("click", async () => {
+  const uzak = await ghFetch();
+  if(uzak === undefined) return;
+  if(!uzak){ toast("Depoda henüz veri.json yok."); return; }
+  if(!confirm("GitHub'daki yedek bu cihazdakinin yerine geçecek. Devam edilsin mi?")) return;
+  state = uzak;
+  localStorage.setItem(STORE_KEY, JSON.stringify(state));
+  renderAll(); mSync.classList.remove("open");
+  toast("GitHub'dan geri yüklendi ✓");
+});
+
+function ghHeaders(token){
+  return { "Authorization": "Bearer " + token, "Accept": "application/vnd.github+json" };
+}
+async function ghFetch(){
+  const c = ghCfg();
+  if(!c){ toast("Önce depo ve token'ı kaydet."); return undefined; }
+  try{
+    const r = await fetch("https://api.github.com/repos/" + c.repo + "/contents/veri.json",
+                          { headers: ghHeaders(c.token), cache:"no-store" });
+    if(r.status === 404) return null;
+    if(!r.ok) throw new Error("HTTP " + r.status);
+    const j = await r.json();
+    const metin = decodeURIComponent(escape(atob(j.content.replace(/\n/g,""))));
+    const s = JSON.parse(metin);
+    if(!s || typeof s.games !== "object") throw new Error("biçim");
+    s._sha = j.sha;
+    return s;
+  }catch(e){
+    toast("GitHub'a ulaşılamadı — depo adı ve token'ı kontrol et.");
+    return undefined;
+  }
+}
+async function ghSaveNow(bildir){
+  const c = ghCfg();
+  if(!c){ if(bildir) toast("Önce depo ve token'ı kaydet."); return false; }
+  try{
+    let sha = null;
+    const eski = await fetch("https://api.github.com/repos/" + c.repo + "/contents/veri.json",
+                             { headers: ghHeaders(c.token), cache:"no-store" });
+    if(eski.ok){ sha = (await eski.json()).sha; }
+    else if(eski.status !== 404){ throw new Error("HTTP " + eski.status); }
+    const veri = { games: state.games, savedAt: state.savedAt || Date.now() };
+    const govde = {
+      message: "Oyun Defteri yedeği",
+      content: btoa(unescape(encodeURIComponent(JSON.stringify(veri, null, 2))))
+    };
+    if(sha) govde.sha = sha;
+    const r = await fetch("https://api.github.com/repos/" + c.repo + "/contents/veri.json", {
+      method:"PUT", headers: ghHeaders(c.token), body: JSON.stringify(govde)
+    });
+    if(!r.ok) throw new Error("HTTP " + r.status);
+    if(bildir) toast("GitHub'a kaydedildi ✓");
+    return true;
+  }catch(e){
+    if(bildir) toast("Kaydedilemedi — token izinlerini (Contents: Read and write) kontrol et.");
+    return false;
+  }
+}
+function ghQueue(){
+  if(!ghCfg()) return;
+  clearTimeout(ghTimer);
+  ghTimer = setTimeout(()=> ghSaveNow(false), 15000);
+}
+async function ghStartup(){
+  if(!ghCfg()) return;
+  const uzak = await ghFetch();
+  if(uzak && (uzak.savedAt || 0) > (state.savedAt || 0)){
+    state = { games: uzak.games, savedAt: uzak.savedAt };
+    localStorage.setItem(STORE_KEY, JSON.stringify(state));
+    renderAll();
+    toast("GitHub'daki daha güncel liste yüklendi ✓");
+  }
+}
+
+/* ---------- servis çalışanı + başlat ---------- */
+function renderAll(){ renderTabs(); renderList(); }
+
+if("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")){
+  navigator.serviceWorker.register("sw.js").catch(()=>{});
+}
+
+ghUi();
+renderAll();
+ghStartup();
+</script>
+</body>
+</html>
