@@ -70,6 +70,31 @@
       "note": "",
       "added": 1783443035297
     },
+    "442857": {
+      "id": "442857",
+      "name": "Tomb Raider: Definitive Edition",
+      "released": "2014-01-31",
+      "tba": false,
+      "bg": "https://media.rawg.io/media/games/08e/08e8d09cd5aae30959c4486649fda3e6.jpg",
+      "platforms": [
+        "PC",
+        "PlayStation 5",
+        "Xbox One",
+        "PlayStation 4",
+        "Xbox Series S/X",
+        "Nintendo Switch"
+      ],
+      "genres": [
+        "Adventure",
+        "Action"
+      ],
+      "metacritic": 86,
+      "rawgRating": 4.09,
+      "status": "backlog",
+      "myRating": 0,
+      "note": "",
+      "added": 1783443896072
+    },
     "616697": {
       "id": "616697",
       "name": "A Plague Tale: Requiem",
@@ -117,5 +142,5 @@
       "added": 1783443057542
     }
   },
-  "savedAt": 1783443060684
+  "savedAt": 1783443896072
 }
