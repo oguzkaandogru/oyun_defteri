@@ -788,7 +788,7 @@
       ],
       "metacritic": null,
       "rawgRating": 4.28,
-      "status": "playing",
+      "status": "done",
       "myRating": 0,
       "note": "",
       "added": 1783443021873
@@ -885,5 +885,5 @@
       "added": 1783443973132
     }
   },
-  "savedAt": 1783452558447
+  "savedAt": 1784589988549
 }
